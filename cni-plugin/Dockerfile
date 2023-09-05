@@ -1,5 +1,7 @@
 ARG BUILDPLATFORM=linux/amd64
 
+FROM --platform=$BUILDPLATFORM bitnami/kubectl:1.27.5 AS kubectl
+
 # Precompile key slow-to-build dependencies
 FROM --platform=$BUILDPLATFORM golang:1.19-alpine as go-deps
 WORKDIR /linkerd-build
@@ -31,6 +33,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN update-alternatives --set iptables /usr/sbin/iptables-legacy \
     && update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 
+
+COPY --from=kubectl /opt/bitnami/kubectl/bin/kubectl /usr/local/bin/kubectl
 COPY --from=golang /go/bin/linkerd-cni /opt/cni/bin/
 COPY LICENSE .
 COPY cni-plugin/deployment/scripts/install-cni.sh .

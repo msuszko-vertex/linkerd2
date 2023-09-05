@@ -340,6 +340,9 @@ else
     done
 fi
 
+# Remove node taint
+/usr/local/bin/kubectl taint node "${KUBERNETES_NODE_NAME:-$(hostname)}" 'linkerd.io/cni-not-ready:NoSchedule-' || echo "untaint failed"
+
 # Compute SHA for first config file found; this will be updated after every iteration.
 # First config file is likely to be chosen as the de facto CNI config by the
 # host.
